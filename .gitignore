@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual Environment
+.venv/
+backend/.venv/
+
+# Environment variables
+.env
+*.env
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+
+# Node
+node_modules/
