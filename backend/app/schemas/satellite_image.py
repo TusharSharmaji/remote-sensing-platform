@@ -23,7 +23,8 @@ class SatelliteImageCreate(BaseModel):
     band_count: int | None = Field(default=None, gt=0)
     captured_at: datetime | None = None
     footprint: dict[str, Any] | None = Field(
-        default=None, description="GeoJSON Polygon geometry of the image footprint."
+        default=None,
+        description="GeoJSON Polygon geometry of the image footprint.",
     )
 
 
@@ -36,6 +37,10 @@ class SatelliteImageResponse(BaseModel):
     project_id: uuid.UUID
     file_name: str
     file_path: str
+
+    preview_path: str | None = None
+    thumbnail_path: str | None = None
+
     file_size_bytes: int
     sensor_type: str | None
     crs: str | None
@@ -43,6 +48,8 @@ class SatelliteImageResponse(BaseModel):
     height_px: int | None
     band_count: int | None
     captured_at: datetime | None
+
     status: ImageStatus
+
     created_at: datetime
     updated_at: datetime

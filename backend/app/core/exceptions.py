@@ -56,3 +56,17 @@ class InsufficientPermissionsException(AppException):
 
     status_code = status.HTTP_403_FORBIDDEN
     detail = "You do not have permission to perform this action."
+
+
+class ProjectNotFoundException(AppException):
+    """Raised when a referenced project id does not exist."""
+
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Project not found."
+
+
+class ProjectAccessDeniedException(AppException):
+    """Raised when a user attempts to access a project they do not own."""
+
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = "Access denied."

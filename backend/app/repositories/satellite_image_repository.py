@@ -11,10 +11,9 @@ from app.models.satellite_image import ImageStatus, SatelliteImage
 
 
 class SatelliteImageRepository:
-    """Encapsulates all direct database access for the SatelliteImage model."""
+    """Repository for SatelliteImage."""
 
     def __init__(self, db: Session) -> None:
-        """Bind the repository to a SQLAlchemy session."""
         self._db = db
 
     def create(
@@ -32,7 +31,7 @@ class SatelliteImageRepository:
         captured_at: datetime | None = None,
         footprint: Any | None = None,
     ) -> SatelliteImage:
-        """Persist and return a new satellite image record for a project."""
+
         image = SatelliteImage(
             project_id=project_id,
             file_name=file_name,
@@ -46,32 +45,88 @@ class SatelliteImageRepository:
             captured_at=captured_at,
             footprint=footprint,
         )
+
         self._db.add(image)
         self._db.commit()
         self._db.refresh(image)
+
         return image
 
-    def get_by_id(self, image_id: uuid.UUID) -> SatelliteImage | None:
-        """Return the satellite image with the given id, or None if not found."""
+    def get_by_id(
+        self,
+        image_id: uuid.UUID,
+    ) -> SatelliteImage | None:
         return self._db.get(SatelliteImage, image_id)
 
-    def list_by_project(self, project_id: uuid.UUID) -> list[SatelliteImage]:
-        """Return all satellite images belonging to the given project."""
+    def get_by_project_and_id(
+        self,
+        *,
+        project_id: uuid.UUID,
+        image_id: uuid.UUID,
+    ) -> SatelliteImage | None:
+        stmt = select(SatelliteImage).where(
+            SatelliteImage.id == image_id,
+            SatelliteImage.project_id == project_id,
+        )
+
+        return self._db.execute(stmt).scalar_one_or_none()
+
+    def list_by_project(
+        self,
+        project_id: uuid.UUID,
+    ) -> list[SatelliteImage]:
         stmt = (
             select(SatelliteImage)
             .where(SatelliteImage.project_id == project_id)
             .order_by(SatelliteImage.created_at.desc())
         )
+
         return list(self._db.execute(stmt).scalars().all())
 
-    def update_status(self, image: SatelliteImage, status: ImageStatus) -> SatelliteImage:
-        """Update and persist a satellite image's processing status."""
+    def update_status(
+        self,
+        image: SatelliteImage,
+        status: ImageStatus,
+    ) -> SatelliteImage:
+
         image.status = status
+
         self._db.commit()
         self._db.refresh(image)
+
         return image
 
-    def delete(self, image: SatelliteImage) -> None:
-        """Delete a satellite image and cascade to its predictions."""
+    def update_metadata(
+        self,
+        image: SatelliteImage,
+        *,
+        sensor_type: str | None = None,
+        crs: str | None = None,
+        width_px: int | None = None,
+        height_px: int | None = None,
+        band_count: int | None = None,
+        preview_path: str | None = None,
+        thumbnail_path: str | None = None,
+    ) -> SatelliteImage:
+
+        image.sensor_type = sensor_type
+        image.crs = crs
+        image.width_px = width_px
+        image.height_px = height_px
+        image.band_count = band_count
+
+        image.preview_path = preview_path
+        image.thumbnail_path = thumbnail_path
+
+        self._db.commit()
+        self._db.refresh(image)
+
+        return image
+
+    def delete(
+        self,
+        image: SatelliteImage,
+    ) -> None:
+
         self._db.delete(image)
         self._db.commit()

@@ -2,7 +2,7 @@
 
 import uuid
 
-from app.core.exceptions import AppException
+from app.core.exceptions import ProjectAccessDeniedException, ProjectNotFoundException
 from app.models.project import Project
 from app.models.user import User
 from app.repositories.project_repository import ProjectRepository
@@ -43,16 +43,10 @@ class ProjectService:
         project = self._projects.get_by_id(project_id)
 
         if project is None:
-            raise AppException(
-                status_code=404,
-                detail="Project not found.",
-            )
+            raise ProjectNotFoundException()
 
         if project.owner_id != current_user.id:
-            raise AppException(
-                status_code=403,
-                detail="Access denied.",
-            )
+            raise ProjectAccessDeniedException()
 
         return project
 

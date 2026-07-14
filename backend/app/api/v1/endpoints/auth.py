@@ -1,6 +1,7 @@
 """Authentication endpoints: register, login, and token refresh."""
 
 from fastapi import APIRouter, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -39,10 +40,16 @@ async def register(
     summary="Authenticate and receive access/refresh tokens",
 )
 async def login(
-    payload: LoginRequest,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     auth_service: AuthService = Depends(get_auth_service),
 ) -> TokenResponse:
-    """Authenticate a user with email and password and issue a token pair."""
+    """Authenticate a user with email and password."""
+
+    payload = LoginRequest(
+        email=form_data.username,
+        password=form_data.password,
+    )
+
     return auth_service.login(payload)
 
 

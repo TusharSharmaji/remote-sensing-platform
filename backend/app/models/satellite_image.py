@@ -74,4 +74,6 @@ class SatelliteImage(Base):
 
     def __repr__(self) -> str:
         """Return a debug-friendly representation of the satellite image."""
-        return f"<SatelliteImage id={self.id} file_name={self.file_name} status={self.status}>"
+        return f"<SatelliteImage id={self.id} file_name={self.file_name} status={self.status}>" 
+    preview_path = mapped_column(String, nullable=True)
+thumbnail_path = mapped_column(String, nullable=True)
